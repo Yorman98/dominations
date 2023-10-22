@@ -120,8 +120,7 @@ for (let row = 0; row < numRows; row++) {
         case "0":
           // return UrbanCenter;
         case "1":
-          numberOfHouses++;
-          document.querySelector('.houses-qtn').innerHTML = `${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}`;
+          document.querySelector('.mines-qtn').innerHTML = `${numberOfMines} / ${UrbanCenter.maxNumberOfMines}`;
           break;
         case "2":
           // return Casa;
@@ -232,7 +231,7 @@ function updateStructure () {
         UrbanCenter.lvl++;
         UrbanCenter.maxNumberOfMines += 2;
         UrbanCenter.maxNumberOfHouses += 2;
-        document.querySelector('.houses-qtn').innerHTML = `${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}`;
+        document.querySelector('.mines-qtn').innerHTML = `${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}`;
       } else {
         alert("No tienes suficiente oro para avanzar a la siguiente edad.");
       }
@@ -261,7 +260,8 @@ structureNavRecourse.innerHTML = `
      <span>
         Oro: <span class="gold-qtn">${gold}</span>
         Workers: <span class="workers-qtn">${numberOfHouses}</span>
-        Houses: <span class="houses-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span>
+        Houses: <span class="houses-qtn">${numberOfHouses}</span>
+        Mines: <span class="mines-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span>
      </span>
   `;
 
