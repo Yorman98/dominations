@@ -162,7 +162,7 @@ function selectStructure(structure) {
 
         case "M":
             // Si la estructura es una Mina, se verifica si hay suficiente oro para comprarla
-            if(gold >= structure.price) {
+            if(gold >= structure.price && numberOfMines < UrbanCenter.maxNumberOfMines) {
                 gold -= structure.price;
                 document.querySelector('.gold-qtn').innerHTML = gold;
             } else { 
