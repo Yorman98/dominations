@@ -3,27 +3,30 @@ const numRows = 15;
 const numCols = 20;
 const gridData = Array.from(Array(numRows), () => Array(numCols).fill(null));
 const UrbanCenter = {
-    name: "CU",
-    type: 0,
-    lvl: 1,
-    maxNumberOfHouses: 2
+  name: "CU",
+  type: 0,
+  lvl: 1,
+  maxNumberOfHouses: 2,
+  maxNumberOfMines: 2
 }
 const Mina = {
   name: "M",
   type: 1,
-  lvl: 2
+  lvl: 2,
+  price: 200
 }
 const Casa = {
-    name: "C",
-    type: 2,
-    lvl: 1,
-    price: 100
+  name: "C",
+  type: 2,
+  lvl: 1,
+  price: 100
 }
-let gold = 100;
 let numberOfHouses = 0;
+let numberOfMines = 0;
 let numberOfWorkers = 2;
+let gold = 500;
 goldTime = 5;
-goldFarmer = [];
+activeGoldFarmer = 1;
 
 let selectedStructure = null;
 const recourseData = {
@@ -79,26 +82,32 @@ for (let row = 0; row < numRows; row++) {
     function checkAction(cell) {
       switch (Number(cell.dataset.type)) {
         case 1:
+          let time = goldTime;
+          let activeMineId = activeGoldFarmer;
+
+
+          const structureGoldFarmer = document.createElement('div');
           structureGoldFarmer.innerHTML = `
-            <div class="gold-farmer">
-              Tiempo restante de oro: <span class="gold-farmer-time">${goldTime}</span>
+            <div class="gold-farmer-${activeMineId}">
+              Tiempo restante de oro: <span class="gold-farmer-time-${activeMineId}">${goldTime}</span>
             </div>
           `;
           document.querySelector('.game-info').appendChild(structureGoldFarmer);
 
-          setInterval(() => {
-            goldTime--;
-            document.querySelector('.gold-farmer-time').innerHTML = goldTime;
-            if (goldTime === 0) {
-              goldTime = 5;
+          const conuter = setInterval(() => {
+            time--;
+            document.querySelector(`.gold-farmer-time-${activeMineId}`).innerHTML = time;
+            if (time === 0) {
+              clearInterval(conuter);
             }
           }, 1000);
 
           setTimeout(() => {
             gold += 500 * Mina.lvl;
             document.querySelector('.gold-qtn').innerHTML = gold;
-            document.querySelector('.game-info').remove();
+            document.querySelector(`.gold-farmer-${activeMineId}`).remove();
           }, goldTime * 1000);
+          activeGoldFarmer++; // auementa la cantidad de minas activa
           break;
       }
     }
@@ -148,27 +157,27 @@ function selectStructure(structure) {
   selectedStructure = structure;
 
     switch (structure.name) {
-        case "C":
-            // Si la estructura es una Casa, se verifica si hay suficiente oro para comprarla
-            if(gold >= structure.price && numberOfHouses < UrbanCenter.maxNumberOfHouses) {
-                gold -= structure.price;
-                numberOfHouses++;
-                document.querySelector('.gold-qtn').innerHTML = gold;
-            }else {
-                alert("No tienes suficiente oro para comprar esta Casa.");
-                selectedStructure = null;
-            }
-            break;
+      case "C":
+        // Si la estructura es una Casa, se verifica si hay suficiente oro para comprarla
+        if (gold >= structure.price && numberOfHouses < UrbanCenter.maxNumberOfHouses) {
+          gold -= structure.price;
+          numberOfHouses++;
+          document.querySelector('.gold-qtn').innerHTML = gold;
+        } else {
+          alert("No tienes suficiente oro para comprar esta Casa.");
+          selectedStructure = null;
+        }
+        break;
 
-        case "M":
-            // Si la estructura es una Mina, se verifica si hay suficiente oro para comprarla
-            if(gold >= structure.price && numberOfMines < UrbanCenter.maxNumberOfMines) {
-                gold -= structure.price;
-                document.querySelector('.gold-qtn').innerHTML = gold;
-            } else { 
-                alert("No tienes suficiente oro para comprar esta Mina.");
-                selectedStructure = null;
-            }
+      case "M":
+        // Si la estructura es una Mina, se verifica si hay suficiente oro para comprarla
+        if (gold >= structure.price && numberOfMines < UrbanCenter.maxNumberOfMines) {
+          gold -= structure.price;
+          document.querySelector('.gold-qtn').innerHTML = gold;
+        } else {
+          alert("No tienes suficiente oro para comprar esta Mina.");
+          selectedStructure = null;
+        }
     }
 }
 
@@ -181,15 +190,14 @@ structureButtons.innerHTML = `
     <button onclick="selectStructure(Casa)">Casa (C)</button>
 `;
 
-structureNavRecourse = document.createElement("div");
+const structureNavRecourse = document.createElement("div");
 structureNavRecourse.innerHTML = `
      <span>
         Oro: <span class="gold-qtn">${gold}</span>
         Workers: <span class="workers-qtn">${numberOfWorkers}</span>
         Houses: <span class="houses-qtn">${numberOfHouses}</span>
-     </div>
+     </span>
   `;
-structureGoldFarmer = document.createElement("div");
 
 document.querySelector('.structures').appendChild(structureButtons);
 document.querySelector('.nav').appendChild(structureNavRecourse);
