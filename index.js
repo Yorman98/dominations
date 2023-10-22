@@ -2,6 +2,7 @@ const grid = document.getElementById("game-board");
 const numRows = 15;
 const numCols = 20;
 const gridData = Array.from(Array(numRows), () => Array(numCols).fill(null));
+const maxTimeToBuild = 15000; // 15 segundos
 const UrbanCenter = {
   name: "CU",
   type: 0,
@@ -23,9 +24,15 @@ const Casa = {
   lvl: 1,
   price: 100
 }
+const Food = {
+    name: "F",
+    type: 3,
+    price: 100
+}
 let numberOfHouses = 0;
 let numberOfMines = 0;
 let numberOfWorkers = 2;
+let numberOfFood = 0;
 let gold = 500;
 goldTime = 5;
 activeGoldFarmer = 1;
@@ -132,14 +139,33 @@ for (let row = 0; row < numRows; row++) {
       clickedCell = cell;
       if (selectedStructure !== null) {
         if (!cell.classList.contains("occupied")) {
-          cell.innerHTML = selectedStructure.name;
-          cell.classList.remove("hovered");
-          cell.classList.add(`occupied`);
-          cell.setAttribute("data-type", selectedStructure.type);
-          cell.setAttribute("data-lvl", selectedStructure.lvl);
-          selectedStructure = null;
-          checkTypeStructure(cell);
-
+            var time = maxTimeToBuild / 1000;
+            var messageInterval = setInterval(() => {
+                // Mensaje decirle al usuario que la estructura se está construyendo
+                const buildingStructure = document.createElement('div');
+                buildingStructure.innerHTML = `
+                    <div class="building-structure">
+                        Construyendo estructura tipo (${selectedStructure.name}) en ${time}...
+                    </div>
+                `;
+                // borrando el mensaje anterior
+                document.querySelector('.game-info').innerHTML = '';
+                // agregando el nuevo mensaje
+                document.querySelector('.game-info').appendChild(buildingStructure);
+                time--;
+            }, 1000);
+            setTimeout(() => {
+                cell.innerHTML = selectedStructure.name;
+                cell.classList.remove("hovered");
+                cell.classList.add(`occupied`);
+                cell.setAttribute("data-type", selectedStructure.type);
+                cell.setAttribute("data-lvl", selectedStructure.lvl);
+                selectedStructure = null;
+                checkTypeStructure(cell);
+                clearInterval(messageInterval);
+                document.querySelector('.game-info').innerHTML = '';
+                time = maxTimeToBuild / 1000;
+            }, maxTimeToBuild);
         } else {
           alert("Esta casilla ya está ocupada.");
         }
@@ -268,6 +294,10 @@ function showAnimalLetterOnGrid() {
                 gold += 100;
                 // actualizar la cantidad de oro en el DOM
                 document.querySelector('.gold-qtn').innerHTML = gold;
+                // aumentar la cantidad de comida
+                numberOfFood++;
+                // actualizar la cantidad de comida en el DOM
+                document.querySelector('.food-qtn').innerHTML = numberOfFood;
                 randomCell.innerHTML = '';
                 randomCell.classList.add("empty");
                 randomCell.classList.remove("occupied-by-animal");
@@ -299,6 +329,7 @@ structureNavRecourse.innerHTML = `
         Workers: <span class="workers-qtn">${numberOfHouses}</span>
         Houses: <span class="houses-qtn">${numberOfHouses}</span>
         Mines: <span class="mines-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span>
+        Food: <span class="food-qtn">${numberOfFood}</span>
      </span>
   `;
 
