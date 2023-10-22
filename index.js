@@ -6,14 +6,16 @@ const UrbanCenter = {
   name: "CU",
   type: 0,
   lvl: 1,
+  updatePrice: 500,
   maxNumberOfHouses: 2,
   maxNumberOfMines: 2
 }
 const Mina = {
   name: "M",
   type: 1,
-  lvl: 2,
-  price: 200
+  lvl: 1,
+  price: 200,
+  updatePrice: 200
 }
 const Casa = {
   name: "C",
@@ -29,9 +31,7 @@ goldTime = 5;
 activeGoldFarmer = 1;
 
 let selectedStructure = null;
-const recourseData = {
-  maxGoldFarmers: 2
-}
+let clickedCell = null;
 
 // Función para verificar si una celda está en las orillas de la matriz
 function isOnBorder(row, col) {
@@ -62,7 +62,10 @@ for (let row = 0; row < numRows; row++) {
     // Si la celda está dentro del "Centro Urbano", asigna "CU"
     if (isCenterCell(row, col)) {
       cell.innerHTML = "CU";
+      cell.setAttribute("data-type", 0);
+      cell.setAttribute("data-lvl", 1);
       cell.classList.add("occupied");
+      cell.classList.add("cu");
     }
 
     cell.addEventListener("mouseenter", () => {
@@ -85,7 +88,6 @@ for (let row = 0; row < numRows; row++) {
           let time = goldTime;
           let activeMineId = activeGoldFarmer;
 
-
           const structureGoldFarmer = document.createElement('div');
           structureGoldFarmer.innerHTML = `
             <div class="gold-farmer-${activeMineId}">
@@ -94,68 +96,105 @@ for (let row = 0; row < numRows; row++) {
           `;
           document.querySelector('.game-info').appendChild(structureGoldFarmer);
 
-          const conuter = setInterval(() => {
+          const counter = setInterval(() => {
             time--;
             document.querySelector(`.gold-farmer-time-${activeMineId}`).innerHTML = time;
             if (time === 0) {
-              clearInterval(conuter);
+              clearInterval(counter);
             }
           }, 1000);
 
           setTimeout(() => {
-            gold += 500 * Mina.lvl;
+            gold += 500 * cell.dataset.lvl;
             document.querySelector('.gold-qtn').innerHTML = gold;
             document.querySelector(`.gold-farmer-${activeMineId}`).remove();
           }, goldTime * 1000);
           activeGoldFarmer++; // auementa la cantidad de minas activa
           break;
       }
+      clickedCell = null;
+    }
+
+    function checkTypeStructure () {
+      switch (cell.dataset.type) {
+        case "0":
+          // return UrbanCenter;
+        case "1":
+          numberOfHouses++;
+          document.querySelector('.houses-qtn').innerHTML = `${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}`;
+          break;
+        case "2":
+          // return Casa;
+      }
     }
 
     // evento clic para agregar estructuras o realizar acciones en las estructuras existentes
     cell.addEventListener("click", (e) => {
+      clickedCell = cell;
       if (selectedStructure !== null) {
         if (!cell.classList.contains("occupied")) {
           cell.innerHTML = selectedStructure.name;
           cell.classList.remove("hovered");
           cell.classList.add(`occupied`);
           cell.setAttribute("data-type", selectedStructure.type);
+          cell.setAttribute("data-lvl", selectedStructure.lvl);
           selectedStructure = null;
+          checkTypeStructure(cell);
 
         } else {
           alert("Esta casilla ya está ocupada.");
         }
-      } else {
-        checkAction(cell);
+      } else if (clickedCell.innerHTML !== "") {
+        structureAction(cell);
       }
     });
 
     grid.appendChild(cell);
   }
+}
 
-  const modal = document.getElementById('myModal');
-  const opcion1Btn = document.getElementById('opcion1Btn');
-  const opcion2Btn = document.getElementById('opcion2Btn');
+const modal = document.getElementById('myModal');
+const updateBtn = document.getElementById('updateBtn');
+const farmBtn = document.getElementById('farmBtn');
 
-  // openModalBtn.addEventListener('click', function() {
-  //   modal.style.display = 'block';
-  // });
+// mejorar estructura
+updateBtn.addEventListener('click', function() {
+  modal.style.display = 'none';
+  updateStructure();
+});
 
-  opcion1Btn.addEventListener('click', function() {
-    // Lógica para la opción 1
-    modal.style.display = 'none';
-  });
+// recolectar oro
+farmBtn.addEventListener('click', function() {
+  modal.style.display = 'none';
+  checkAction(clickedCell);
+});
 
-  opcion2Btn.addEventListener('click', function() {
-    // Lógica para la opción 2
-    modal.style.display = 'none';
-  });
+function structureAction(cell) {
+  farmBtn.style.display = 'inline-block';
+  switch (cell.dataset.type) {
+    case "0":
+      document.querySelector('.structure-info').innerHTML =
+        ` 
+         Costo de la mejora ${cell.dataset.lvl * UrbanCenter.updatePrice} <br>
+         Oro disponible: ${gold}
+      `;
+      farmBtn.style.display = 'none';
+      modal.style.display = 'block';
+      break;
+    case "1":
+      document.querySelector('.structure-info').innerHTML =
+        ` 
+         Costo de la mejora ${cell.dataset.lvl * Mina.updatePrice} <br>
+         Oro disponible: ${gold}
+      `;
+      modal.style.display = 'block';
+      break;
+  }
 }
 
 // Función para seleccionar una estructura
 function selectStructure(structure) {
   selectedStructure = structure;
-
     switch (structure.name) {
       case "C":
         // Si la estructura es una Casa, se verifica si hay suficiente oro para comprarla
@@ -182,12 +221,38 @@ function selectStructure(structure) {
     }
 }
 
+function updateStructure () {
+  switch (clickedCell.dataset.type) {
+    case "0":
+      if (gold >= UrbanCenter.updatePrice * clickedCell.dataset.lvl) {
+        gold -= UrbanCenter.updatePrice * clickedCell.dataset.lvl;
+        document.querySelectorAll('.cu').forEach((cu) => {
+          cu.setAttribute('data-lvl', Number(cu.dataset.lvl) + 1);
+        })
+        UrbanCenter.lvl++;
+        UrbanCenter.maxNumberOfMines += 2;
+        UrbanCenter.maxNumberOfHouses += 2;
+        document.querySelector('.houses-qtn').innerHTML = `${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}`;
+      } else {
+        alert("No tienes suficiente oro para avanzar a la siguiente edad.");
+      }
+      break;
+    case "1":
+      if (gold >= Mina.updatePrice * clickedCell.dataset.lvl) {
+        gold -= Mina.updatePrice * clickedCell.dataset.lvl;
+        clickedCell.setAttribute('data-lvl', Number(clickedCell.dataset.lvl) + 1);
+      } else {
+        alert("No tienes suficiente oro para actualizar esta Mina.");
+      }
+  }
+  document.querySelector('.gold-qtn').innerHTML = gold;
+  clickedCell = null;
+}
+
 // Agregar botones para seleccionar estructuras
 const structureButtons = document.createElement("div");
 structureButtons.innerHTML = `
     <button onclick="selectStructure(Mina)">Mina de gold (M)</button>
-    <button onclick="selectStructure('E')">Recolector de Elixir (E)</button>
-    <button onclick="selectStructure('D')">Torre de Defensa (D)</button>
     <button onclick="selectStructure(Casa)">Casa (C)</button>
 `;
 
@@ -195,8 +260,8 @@ const structureNavRecourse = document.createElement("div");
 structureNavRecourse.innerHTML = `
      <span>
         Oro: <span class="gold-qtn">${gold}</span>
-        Workers: <span class="workers-qtn">${numberOfWorkers}</span>
-        Houses: <span class="houses-qtn">${numberOfHouses}</span>
+        Workers: <span class="workers-qtn">${numberOfHouses}</span>
+        Houses: <span class="houses-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span>
      </span>
   `;
 

@@ -52,3 +52,7 @@
     width: 50%;
     text-align: center;
 }
+
+.hidden {
+    display: none;
+}
