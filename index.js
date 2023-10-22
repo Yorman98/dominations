@@ -147,17 +147,29 @@ for (let row = 0; row < numRows; row++) {
 function selectStructure(structure) {
   selectedStructure = structure;
 
-  // Si la estructura es una Casa, se verifica si hay suficiente oro para comprarla
-  if(structure.name === "C") {
-    if(gold >= structure.price && numberOfHouses < UrbanCenter.maxNumberOfHouses) {
-      gold -= structure.price;
-      numberOfHouses++;
-      document.querySelector('.gold-qtn').innerHTML = gold;
-    } else {
-      alert("No tienes suficiente oro para comprar esta estructura.");
-      selectedStructure = null;
+    switch (structure.name) {
+        case "C":
+            // Si la estructura es una Casa, se verifica si hay suficiente oro para comprarla
+            if(gold >= structure.price && numberOfHouses < UrbanCenter.maxNumberOfHouses) {
+                gold -= structure.price;
+                numberOfHouses++;
+                document.querySelector('.gold-qtn').innerHTML = gold;
+            }else {
+                alert("No tienes suficiente oro para comprar esta Casa.");
+                selectedStructure = null;
+            }
+            break;
+
+        case "M":
+            // Si la estructura es una Mina, se verifica si hay suficiente oro para comprarla
+            if(gold >= structure.price) {
+                gold -= structure.price;
+                document.querySelector('.gold-qtn').innerHTML = gold;
+            } else { 
+                alert("No tienes suficiente oro para comprar esta Mina.");
+                selectedStructure = null;
+            }
     }
-  }
 }
 
 // Agregar botones para seleccionar estructuras
