@@ -2,12 +2,26 @@ const grid = document.getElementById("game-board");
 const numRows = 15;
 const numCols = 20;
 const gridData = Array.from(Array(numRows), () => Array(numCols).fill(null));
+const UrbanCenter = {
+    name: "CU",
+    type: 0,
+    lvl: 1,
+    maxNumberOfHouses: 2
+}
 const Mina = {
   name: "M",
   type: 1,
   lvl: 2
 }
+const Casa = {
+    name: "C",
+    type: 2,
+    lvl: 1,
+    price: 100
+}
 let gold = 100;
+let numberOfHouses = 0;
+let numberOfWorkers = 2;
 goldTime = 5;
 goldFarmer = [];
 
@@ -132,6 +146,18 @@ for (let row = 0; row < numRows; row++) {
 // Función para seleccionar una estructura
 function selectStructure(structure) {
   selectedStructure = structure;
+
+  // Si la estructura es una Casa, se verifica si hay suficiente oro para comprarla
+  if(structure.name === "C") {
+    if(gold >= structure.price && numberOfHouses < UrbanCenter.maxNumberOfHouses) {
+      gold -= structure.price;
+      numberOfHouses++;
+      document.querySelector('.gold-qtn').innerHTML = gold;
+    } else {
+      alert("No tienes suficiente oro para comprar esta estructura.");
+      selectedStructure = null;
+    }
+  }
 }
 
 // Agregar botones para seleccionar estructuras
@@ -140,6 +166,7 @@ structureButtons.innerHTML = `
     <button onclick="selectStructure(Mina)">Mina de gold (M)</button>
     <button onclick="selectStructure('E')">Recolector de Elixir (E)</button>
     <button onclick="selectStructure('D')">Torre de Defensa (D)</button>
+    <button onclick="selectStructure(Casa)">Casa (C)</button>
 `;
 
 structureNavRecourse = document.createElement("div");
