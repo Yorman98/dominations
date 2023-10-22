@@ -248,6 +248,43 @@ function updateStructure () {
   clickedCell = null;
 }
 
+// Agregar un animal aleatorio en una celda vacía
+function showAnimalLetterOnGrid() {
+    const emptyCells = document.querySelectorAll(".empty");
+    // Elige una celda vacía al azar excepto las celdas en las orillas
+    const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+
+    if (!randomCell.innerHTML) {
+        const randomAnimal = "An";
+        randomCell.innerHTML = randomAnimal;
+        randomCell.classList.add("occupied-by-animal");
+        randomCell.classList.remove("empty");
+        randomCell.setAttribute("data-type", randomAnimal);
+
+        // Agrega un evento clic para eliminar la letra
+        randomCell.addEventListener("click", () => {
+            if(randomCell.classList.contains("occupied-by-animal")) {
+                // aumentar la cantidad de oro
+                gold += 100;
+                // actualizar la cantidad de oro en el DOM
+                document.querySelector('.gold-qtn').innerHTML = gold;
+                randomCell.innerHTML = '';
+                randomCell.classList.add("empty");
+                randomCell.classList.remove("occupied-by-animal");
+                randomCell.removeAttribute("data-type");
+            }
+        });
+
+        // configura un temporizador para eliminar la letra después de un cierto tiempo
+        setTimeout(() => {
+        randomCell.innerHTML = '';
+        randomCell.classList.add("empty");
+        randomCell.classList.remove("occupied");
+        randomCell.removeAttribute("data-type");
+        }, 5000); // Cambia 5000 a la cantidad de tiempo deseada en milisegundos
+    }
+}  
+
 // Agregar botones para seleccionar estructuras
 const structureButtons = document.createElement("div");
 structureButtons.innerHTML = `
@@ -267,3 +304,5 @@ structureNavRecourse.innerHTML = `
 
 document.querySelector('.structures').appendChild(structureButtons);
 document.querySelector('.nav').appendChild(structureNavRecourse);
+// Agregar un temporizador para mostrar un animal aleatorio en una celda vacía cada 15 segundos
+setInterval(showAnimalLetterOnGrid, 15000); 
