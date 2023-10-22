@@ -173,6 +173,8 @@ structureNavRecourse = document.createElement("div");
 structureNavRecourse.innerHTML = `
      <span>
         Oro: <span class="gold-qtn">${gold}</span>
+        Workers: <span class="workers-qtn">${numberOfWorkers}</span>
+        Houses: <span class="houses-qtn">${numberOfHouses}</span>
      </div>
   `;
 structureGoldFarmer = document.createElement("div");
