@@ -110,14 +110,13 @@ for (let row = 0; row < numRows; row++) {
     grid.appendChild(cell);
   }
 
-  const openModalBtn = document.getElementById('openModalBtn');
   const modal = document.getElementById('myModal');
   const opcion1Btn = document.getElementById('opcion1Btn');
   const opcion2Btn = document.getElementById('opcion2Btn');
 
-  openModalBtn.addEventListener('click', function() {
-    modal.style.display = 'block';
-  });
+  // openModalBtn.addEventListener('click', function() {
+  //   modal.style.display = 'block';
+  // });
 
   opcion1Btn.addEventListener('click', function() {
     // Lógica para la opción 1
