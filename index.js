@@ -34,7 +34,7 @@ let numberOfMines = 0;
 let numberOfWorkers = 2;
 let numberOfFood = 0;
 
-let gold = 500;
+let gold = 1500;
 let goldTime = 5;
 let activeGoldFarmer = 1;
 let activeBuilders = 1;
@@ -142,6 +142,7 @@ for (let row = 0; row < numRows; row++) {
       if (selectedStructure !== null) {
         if (!cell.classList.contains("occupied") && numberOfWorkers > 0) {
             var time = maxTimeToBuild / 1000;
+            let auxStructure = selectedStructure;
             numberOfWorkers--;
             document.querySelector('.workers-qtn').innerHTML = numberOfWorkers;
             // Mensaje decirle al usuario que la estructura se está construyendo
@@ -149,32 +150,31 @@ for (let row = 0; row < numRows; row++) {
             let activeBuildersId = activeBuilders;
             buildingStructure.innerHTML = `
                 <div class="building-structure-${activeBuildersId}">
-                    Construyendo estructura tipo (${selectedStructure.name}) en ${time}...
+                    Construyendo estructura tipo (${auxStructure.name}) en ${time}...
                 </div>
             `;
             document.querySelector('.game-info').appendChild(buildingStructure);
             var messageInterval = setInterval(() => {
-                
                 document.querySelector(`.building-structure-${activeBuildersId}`).innerHTML = `
                     <div class="building-structure-${activeBuildersId}">
-                        Construyendo estructura tipo (${selectedStructure.name}) en ${time}...
+                        Construyendo estructura tipo (${auxStructure.name}) en ${time}...
                     </div>
                 `;
                 time--;
                 if (time === 0) clearInterval(messageInterval);
             }, 1000);
             setTimeout(() => {
-                cell.innerHTML = selectedStructure.name;
-                if(selectedStructure.name === "C") {
+                cell.innerHTML = auxStructure.name;
+                if(auxStructure.name === "C") {
                     numberOfWorkers++;
                 }
                 cell.classList.remove("hovered");
                 cell.classList.add(`occupied`);
-                cell.setAttribute("data-type", selectedStructure.type);
-                cell.setAttribute("data-lvl", selectedStructure.lvl);
+                cell.setAttribute("data-type", auxStructure.type);
+                cell.setAttribute("data-lvl", auxStructure.lvl);
                 selectedStructure = null;
                 checkTypeStructure(cell);
-                document.querySelector('.game-info').innerHTML = '';
+                document.querySelector(`.building-structure-${activeBuildersId}`).remove();
                 time = maxTimeToBuild / 1000;
                 numberOfWorkers++;
                 document.querySelector('.workers-qtn').innerHTML = numberOfWorkers;
