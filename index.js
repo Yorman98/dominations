@@ -2,7 +2,7 @@ const grid = document.getElementById("game-board");
 const numRows = 15;
 const numCols = 20;
 const gridData = Array.from(Array(numRows), () => Array(numCols).fill(null));
-const maxTimeToBuild = 15000; // 15 segundos
+const maxTimeToBuild = 10000; // 15 segundos
 const UrbanCenter = {
   name: "CU",
   type: 0,
@@ -33,9 +33,11 @@ let numberOfHouses = 0;
 let numberOfMines = 0;
 let numberOfWorkers = 2;
 let numberOfFood = 0;
+
 let gold = 500;
-goldTime = 5;
-activeGoldFarmer = 1;
+let goldTime = 5;
+let activeGoldFarmer = 1;
+let activeBuilders = 1;
 
 let selectedStructure = null;
 let clickedCell = null;
@@ -138,34 +140,47 @@ for (let row = 0; row < numRows; row++) {
     cell.addEventListener("click", (e) => {
       clickedCell = cell;
       if (selectedStructure !== null) {
-        if (!cell.classList.contains("occupied")) {
+        if (!cell.classList.contains("occupied") && numberOfWorkers > 0) {
             var time = maxTimeToBuild / 1000;
+            numberOfWorkers--;
+            document.querySelector('.workers-qtn').innerHTML = numberOfWorkers;
+            // Mensaje decirle al usuario que la estructura se está construyendo
+            const buildingStructure = document.createElement('div');
+            let activeBuildersId = activeBuilders;
+            buildingStructure.innerHTML = `
+                <div class="building-structure-${activeBuildersId}">
+                    Construyendo estructura tipo (${selectedStructure.name}) en ${time}...
+                </div>
+            `;
+            document.querySelector('.game-info').appendChild(buildingStructure);
             var messageInterval = setInterval(() => {
-                // Mensaje decirle al usuario que la estructura se está construyendo
-                const buildingStructure = document.createElement('div');
-                buildingStructure.innerHTML = `
-                    <div class="building-structure">
+                
+                document.querySelector(`.building-structure-${activeBuildersId}`).innerHTML = `
+                    <div class="building-structure-${activeBuildersId}">
                         Construyendo estructura tipo (${selectedStructure.name}) en ${time}...
                     </div>
                 `;
-                // borrando el mensaje anterior
-                document.querySelector('.game-info').innerHTML = '';
-                // agregando el nuevo mensaje
-                document.querySelector('.game-info').appendChild(buildingStructure);
                 time--;
+                if (time === 0) clearInterval(messageInterval);
             }, 1000);
             setTimeout(() => {
                 cell.innerHTML = selectedStructure.name;
+                if(selectedStructure.name === "C") {
+                    numberOfWorkers++;
+                }
                 cell.classList.remove("hovered");
                 cell.classList.add(`occupied`);
                 cell.setAttribute("data-type", selectedStructure.type);
                 cell.setAttribute("data-lvl", selectedStructure.lvl);
                 selectedStructure = null;
                 checkTypeStructure(cell);
-                clearInterval(messageInterval);
                 document.querySelector('.game-info').innerHTML = '';
                 time = maxTimeToBuild / 1000;
+                numberOfWorkers++;
+                document.querySelector('.workers-qtn').innerHTML = numberOfWorkers;
             }, maxTimeToBuild);
+
+            activeBuilders++;
         } else {
           alert("Esta casilla ya está ocupada.");
         }
@@ -226,6 +241,7 @@ function selectStructure(structure) {
         if (gold >= structure.price && numberOfHouses < UrbanCenter.maxNumberOfHouses) {
           gold -= structure.price;
           numberOfHouses++;
+          document.querySelector('.houses-qtn').innerHTML = numberOfHouses;
           document.querySelector('.gold-qtn').innerHTML = gold;
         } else {
           alert("No tienes suficiente oro para comprar esta Casa.");
@@ -238,6 +254,7 @@ function selectStructure(structure) {
         if (gold >= structure.price && numberOfMines < UrbanCenter.maxNumberOfMines) {
           gold -= structure.price;
           numberOfMines++;
+          document.querySelector('.mines-qtn').innerHTML = `${numberOfMines} / ${UrbanCenter.maxNumberOfMines}`;
           document.querySelector('.gold-qtn').innerHTML = gold;
         } else {
           alert("No tienes suficiente oro para comprar esta Mina.");
@@ -326,7 +343,7 @@ const structureNavRecourse = document.createElement("div");
 structureNavRecourse.innerHTML = `
      <span>
         Oro: <span class="gold-qtn">${gold}</span>
-        Workers: <span class="workers-qtn">${numberOfHouses}</span>
+        Workers: <span class="workers-qtn">${numberOfWorkers}</span>
         Houses: <span class="houses-qtn">${numberOfHouses}</span>
         Mines: <span class="mines-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span>
         Food: <span class="food-qtn">${numberOfFood}</span>
