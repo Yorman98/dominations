@@ -9,7 +9,8 @@ const UrbanCenter = {
   lvl: 1,
   updatePrice: 500,
   maxNumberOfHouses: 2,
-  maxNumberOfMines: 2
+  maxNumberOfMines: 2,
+  maxNumberOfWorkers: 2
 }
 const Mina = {
   name: "M",
@@ -144,7 +145,7 @@ for (let row = 0; row < numRows; row++) {
             var time = maxTimeToBuild / 1000;
             let auxStructure = selectedStructure;
             numberOfWorkers--;
-            document.querySelector('.workers-qtn').innerHTML = numberOfWorkers;
+            document.querySelector('.workers-qtn').innerHTML = `${numberOfWorkers} / ${UrbanCenter.maxNumberOfWorkers}`;
             // Mensaje decirle al usuario que la estructura se está construyendo
             const buildingStructure = document.createElement('div');
             let activeBuildersId = activeBuilders;
@@ -177,7 +178,7 @@ for (let row = 0; row < numRows; row++) {
                 document.querySelector(`.building-structure-${activeBuildersId}`).remove();
                 time = maxTimeToBuild / 1000;
                 numberOfWorkers++;
-                document.querySelector('.workers-qtn').innerHTML = numberOfWorkers;
+                document.querySelector('.workers-qtn').innerHTML = `${numberOfWorkers} / ${UrbanCenter.maxNumberOfWorkers}`;
             }, maxTimeToBuild);
 
             activeBuilders++;
@@ -275,6 +276,7 @@ function updateStructure () {
         UrbanCenter.maxNumberOfMines += 2;
         UrbanCenter.maxNumberOfHouses += 2;
         document.querySelector('.mines-qtn').innerHTML = `${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}`;
+        document.querySelector('.urban-center-lvl').innerHTML = UrbanCenter.lvl;
       } else {
         alert("No tienes suficiente oro para avanzar a la siguiente edad.");
       }
@@ -341,13 +343,14 @@ structureButtons.innerHTML = `
 
 const structureNavRecourse = document.createElement("div");
 structureNavRecourse.innerHTML = `
-     <span>
-        Oro: <span class="gold-qtn">${gold}</span>
-        Workers: <span class="workers-qtn">${numberOfWorkers}</span>
-        Houses: <span class="houses-qtn">${numberOfHouses}</span>
-        Mines: <span class="mines-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span>
-        Food: <span class="food-qtn">${numberOfFood}</span>
-     </span>
+     <div class="nav-info">
+        <span class="info-container">Nivel de la aldea: <span class="urban-center-lvl">${UrbanCenter.lvl}</span></span>
+        <span class="info-container">Oro: <span class="gold-qtn">${gold}</span></span>
+        <span class="info-container">Workers: <span class="workers-qtn">${numberOfWorkers} / ${UrbanCenter.maxNumberOfWorkers}</span></span>
+        <span class="info-container">Houses: <span class="houses-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfHouses}</span></span>
+        <span class="info-container">Mines: <span class="mines-qtn">${numberOfHouses} / ${UrbanCenter.maxNumberOfMines}</span></span>
+        <span class="info-container">Food: <span class="food-qtn">${numberOfFood}</span></span>
+     </div>
   `;
 
 document.querySelector('.structures').appendChild(structureButtons);

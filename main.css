@@ -56,3 +56,28 @@
 .hidden {
     display: none;
 }
+
+.structures {
+    margin: 40px 0;
+}
+
+.nav-info {
+    background: burlywood;
+    padding: 15px;
+    width: fit-content;
+    border-radius: 8px;
+}
+
+span {
+    color: #FFFFFF;
+    padding: 10px;
+}
+
+span.info-container {
+    border-right: 1px solid;
+    padding: 10px;
+}
+
+span.info-container:last-child {
+    border-right: none;
+}
